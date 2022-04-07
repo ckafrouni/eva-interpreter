@@ -1,7 +1,10 @@
 # Exp ::= Number
 # 	| String
 # 	| [+, Exp, Exp] | [*, Exp, Exp]
-# 	| ['var', Identifier, Exp]
+# 	| ['var', name, Exp]
+# 	| ['set', name, Exp]
+# 	| name
+# 	| ['begin', Exp...]
 # 	;
 
 import re
@@ -45,6 +48,19 @@ class Eva:
 			return self.eval(exp[1], env) * self.eval(exp[2], env)
 
 		# ------------------------------------
+		# Comparison operations:
+		if exp[0] == '>':
+			return self.eval(exp[1], env) > self.eval(exp[2], env)
+		if exp[0] == '<':
+			return self.eval(exp[1], env) < self.eval(exp[2], env)
+		if exp[0] == '>=':
+			return self.eval(exp[1], env) >= self.eval(exp[2], env)
+		if exp[0] == '<=':
+			return self.eval(exp[1], env) <= self.eval(exp[2], env)
+		if exp[0] == '=':
+			return self.eval(exp[1], env) == self.eval(exp[2], env)
+
+		# ------------------------------------
 		# Block: (sequence of expressions)
 		if exp[0] == 'begin':
 			block_env = Environment(parent=env)
@@ -66,6 +82,14 @@ class Eva:
 		# Variable access:
 		if isVariableName(exp):
 			return env.lookup(exp)
+
+		# ------------------------------------
+		# if-expression:
+		if exp[0] == 'if':
+			[_, condition, consequent, alternate] = exp
+			if self.eval(condition, env):
+				return self.eval(consequent, env)
+			return self.eval(alternate, env)
 
 		raise UnimplementedExpression(f"Unimplemented expression: `{exp}`")
 

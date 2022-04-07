@@ -94,3 +94,20 @@ def test_set_keyword_2():
 			],
 			'data'
 		]) == 20
+	
+def test_if():
+	eva = Eva()
+	assert eva.eval(
+		['begin',
+			['var', 'x', 10],
+			['var', 'y', 0],
+			
+			['if', ['>=', 'x', 10],
+				['set', 'y', 20],
+				['set', 'y', 30]
+			],
+			
+			'y'
+		]
+
+	) == 20

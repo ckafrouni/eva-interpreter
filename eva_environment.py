@@ -17,14 +17,23 @@ class Environment:
 		"""
 		self.record[name] = value
 		return value
+
+	def assign(self, name: str, value):
+		"""
+		Creates a variable with the given name and value
+		"""
+		self._resolve(name).record[name] = value
+		return value
 	
 	def lookup(self, name: str):
 		"""
 		Returns the value of a defined variable, else raises Error
 		"""
-		if (value := self.record.get(name)):
-			return value
+		return self._resolve(name).record.get(name)
+	
+	def _resolve(self, name: str) -> Environment:
+		if name in self.record:
+			return self
 		if self.parent:
-			return self.parent.lookup(name)
-
+			return self.parent._resolve(name)
 		raise UndefinedVariable(f"Undefined variable: {name}")

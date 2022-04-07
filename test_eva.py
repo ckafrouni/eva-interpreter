@@ -58,15 +58,39 @@ def test_nestedBlock():
 			'x'
 		]) == 10
 
+def test_nestedBlock_2():
+	eva = Eva()
+	assert eva.eval(
+		['begin', 
+			['var', 'value', 10],
+			['var', 'result', 
+				['begin',
+					['var', 'x', ['+', 'value', 10]],
+					'x'
+				]],
+			'result'
+		]) == 20
 
-def run_tests(tests: List[Callable]):	
-	success = 0
-	for t in tests:
-		try:
-			if t():
-				success += 1
-			else:
-				print(f'Unsuccessfull test: {t.__name__}')
-		except CaughtException as e:
-			print(e)
-	return success, len(tests)
+def test_set_keyword():
+	eva = Eva()
+	assert eva.eval(
+		['begin', 
+			['var', 'data', 10],
+			['begin',
+				['set', 'data', 20],
+			],
+			'data'
+		]) == 20
+
+def test_set_keyword_2():
+	eva = Eva()
+	assert eva.eval(
+		['begin', 
+			['var', 'data', 10],
+			['begin',
+				['begin', 
+					['set', 'data', 20],
+				]
+			],
+			'data'
+		]) == 20

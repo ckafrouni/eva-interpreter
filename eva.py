@@ -51,13 +51,19 @@ class Eva:
 			return self.__eval_block(exp, block_env)
 
 		# ------------------------------------
-		# Variable declaration:
+		# Variable declaration: (var foo 10)
 		if exp[0] == 'var':
 			[_, name, value] = exp
 			return env.define(name, self.eval(value, env))
+
+		# ------------------------------------
+		# Variable update: (set foo 10)
+		if exp[0] == 'set':
+			[_, name, value] = exp
+			return env.assign(name, self.eval(value, env))
 		
 		# ------------------------------------
-		# Variable declaration:
+		# Variable access:
 		if isVariableName(exp):
 			return env.lookup(exp)
 

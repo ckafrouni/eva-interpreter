@@ -14,11 +14,14 @@ class Eva:
 	Eva interpreter
 	"""
 	
-	def __init__(self, _global: Environment = Environment()):
+	def __init__(self, _global: Environment=None):
 		"""
 		Initialises an Eva instance with the global environment
 		"""
+		if not _global:
+			_global = Environment()
 		self._global = _global
+
 
 	def eval(self, exp, env: Environment=None):
 		"""
@@ -37,15 +40,21 @@ class Eva:
 		# ------------------------------------
 		# Math operations:
 		if exp[0] == '+':
-			return self.eval(exp[1]) + self.eval(exp[2])
+			return self.eval(exp[1], env) + self.eval(exp[2], env)
 		if exp[0] == '*':
-			return self.eval(exp[1]) * self.eval(exp[2])
+			return self.eval(exp[1], env) * self.eval(exp[2], env)
+
+		# ------------------------------------
+		# Block: (sequence of expressions)
+		if exp[0] == 'begin':
+			block_env = Environment(parent=env)
+			return self.__eval_block(exp, block_env)
 
 		# ------------------------------------
 		# Variable declaration:
 		if exp[0] == 'var':
 			[_, name, value] = exp
-			return env.define(name, self.eval(value))
+			return env.define(name, self.eval(value, env))
 		
 		# ------------------------------------
 		# Variable declaration:
@@ -53,6 +62,13 @@ class Eva:
 			return env.lookup(exp)
 
 		raise UnimplementedExpression(f"Unimplemented expression: `{exp}`")
+
+	def __eval_block(self, block, env):
+		[_, *expression] = block
+		result = None
+		for exp in expression:
+			result = self.eval(exp, env)
+		return result
 
 
 def isNumber(exp):
@@ -63,47 +79,3 @@ def isString(exp):
 
 def isVariableName(exp):
 	return isinstance(exp, str) and re.match(r"^[a-zA-Z]+$", exp) != None
-
-
-
-#-------------------------------------------------------------------# 
-# Tests
-
-def assert_equals(exp, expected, env=Environment()):
-	try:
-		if not (res:=Eva(env).eval(exp)) == expected:
-			print(f"Evaluation error for `{exp}`:\n\texpected: {expected}\n\tresult: {res}")
-		return True
-	except UnimplementedExpression as e:
-		print(e)
-	except UndefinedVariable as e:
-		print(e)
-
-def tests(env=None):
-	# Self-evaluating:
-	assert_equals(1, 1)
-	assert_equals('"Hello World"', "Hello World")
-	
-	# Math:
-	assert_equals(['+', 1, 5],			 6)
-	assert_equals(['+', ['+', 3, 2], 5], 10)
-	assert_equals(['*', ['+', 3, 2], 5], 25)
-	
-	# Variables:
-	assert_equals(['var', 'x', 10], 10)
-	assert_equals('x', 10)
-	assert_equals(['var', 'y', ['*', 2, 5]], 10)
-	assert_equals('y', 10)
-
-	assert_equals('VERSION', '0.1', env)
-	
-	assert_equals(['var', 'isUser', 'true'], True, env)
-	
-if __name__ == '__main__':
-	env = Environment({
-		"nil": None,
-		"true": True,
-		"false": False,
-		"VERSION": "0.1"
-	})
-	tests(env)

@@ -111,3 +111,23 @@ def test_if():
 		]
 
 	) == 20
+
+def test_while():
+	eva = Eva()
+	assert eva.eval(
+		['begin',
+			['var', 'counter', 0],
+			['var', 'result', 0],
+			
+			['while', ['<', 'counter', 10],
+				# TODO: implement ['++', <Exp>]
+				['begin',
+					['set', 'result', ['+', 'result', 1]],
+					['set', 'counter', ['+', 'counter', 1]]
+				],
+			],
+			
+			'result'
+		]
+
+	) == 10

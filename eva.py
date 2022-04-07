@@ -91,6 +91,15 @@ class Eva:
 				return self.eval(consequent, env)
 			return self.eval(alternate, env)
 
+		# ------------------------------------
+		# while-expression:
+		if exp[0] == 'while':
+			[_, condition, body] = exp
+			result = None
+			while self.eval(condition, env):
+				result = self.eval(body, env)
+			return result
+
 		raise UnimplementedExpression(f"Unimplemented expression: `{exp}`")
 
 	def __eval_block(self, block, env):

@@ -1,21 +1,20 @@
-from tests import new_eva as new_eva
-from parser import parse
+from tests import eval_str as eval_str
 
-def test_0(new_eva):
-	assert new_eva.eval(parse("""
+def test_0(eval_str):
+	assert eval_str("""
 		(begin
 			(var data 10)
 			(begin
 				(set data 20))
 			data)
-	""")) == 20
+	""") == 20
 
-def test_1(new_eva):
-	assert new_eva.eval(parse("""
+def test_1(eval_str):
+	assert eval_str("""
 		(begin
 			(var data 10)
 			(begin
 				(begin
 					(set data 20)))
 			data)
-	""")) == 20
+	""") == 20

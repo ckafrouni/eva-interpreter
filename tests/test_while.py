@@ -1,8 +1,7 @@
-from tests import new_eva as new_eva
-from parser import parse
+from tests import eval_str as eval_str
 
-def test_0(new_eva):
-	assert new_eva.eval(parse("""
+def test_0(eval_str):
+	assert eval_str("""
 		(begin
 			(var counter 0)
 			(var result 0)
@@ -13,4 +12,4 @@ def test_0(new_eva):
 					(set counter (+ counter 1))))
 
 			result)
-	""")) == 10
+	""") == 10

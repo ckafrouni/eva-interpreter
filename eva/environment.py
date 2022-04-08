@@ -37,3 +37,27 @@ class Environment:
 		if self.parent:
 			return self.parent._resolve(name)
 		raise UndefinedVariable(f"Undefined variable: {name}")
+		
+
+GLOBAL_ENVIRONMENT = Environment({
+	'nil': None,
+
+	'true': True,
+	'false': False,
+
+	'__VERSION': '0.1',
+	
+	'+': lambda x, y: x+y,
+	'-': lambda x, y: x-y,
+	'*': lambda x, y: x*y,
+	'/': lambda x, y: x/y,
+
+	'<': lambda x, y: x<y,
+	'>': lambda x, y: x>y,
+	'>=': lambda x, y: x>=y,
+	'<=': lambda x, y: x<=y,
+	'=': lambda x, y: x==y,
+
+	'println': lambda *x: print(*x),
+	'print': lambda *x: print(*x, end=''),
+})

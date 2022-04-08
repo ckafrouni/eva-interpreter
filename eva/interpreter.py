@@ -1,28 +1,30 @@
-# Exp ::= Number
-# 	| String
-# 	| [+, Exp, Exp] | [*, Exp, Exp]
-# 	| ['var', name, Exp]
-# 	| ['set', name, Exp]
-# 	| name
+# Exp 
+# 	: NUMBER
+# 	| STRING
 # 	| ['begin', Exp...]
+# 	| ['var', NAME, Exp]
+# 	| ['set', NAME, Exp]
+# 	| ['if', NAME, Exp]
+# 	| ['while', NAME, Exp]
+# 	| NAME
+# 	| [NAME, Exp...] # Function call
 # 	;
 
 import re
+from typing import Callable, List
 
-from eva.environment import Environment
-from eva.errors import UndefinedVariable, UnimplementedExpression
+from eva.environment import GLOBAL_ENVIRONMENT, Environment
+from eva.errors import UnimplementedExpression
 
 class Eva: 
 	"""
 	Eva interpreter
 	"""
 	
-	def __init__(self, _global: Environment=None):
+	def __init__(self, _global: Environment=GLOBAL_ENVIRONMENT):
 		"""
 		Initialises an Eva instance with the global environment
 		"""
-		if not _global:
-			_global = Environment()
 		self._global = _global
 
 
@@ -42,26 +44,6 @@ class Eva:
 			return exp[1:-1]
 		
 		# ------------------------------------
-		# Math operations:
-		if exp[0] == '+':
-			return self.eval(exp[1], env) + self.eval(exp[2], env)
-		if exp[0] == '*':
-			return self.eval(exp[1], env) * self.eval(exp[2], env)
-
-		# ------------------------------------
-		# Comparison operations:
-		if exp[0] == '>':
-			return self.eval(exp[1], env) > self.eval(exp[2], env)
-		if exp[0] == '<':
-			return self.eval(exp[1], env) < self.eval(exp[2], env)
-		if exp[0] == '>=':
-			return self.eval(exp[1], env) >= self.eval(exp[2], env)
-		if exp[0] == '<=':
-			return self.eval(exp[1], env) <= self.eval(exp[2], env)
-		if exp[0] == '=':
-			return self.eval(exp[1], env) == self.eval(exp[2], env)
-
-		# ------------------------------------
 		# Block: (sequence of expressions)
 		if exp[0] == 'begin':
 			block_env = Environment(parent=env)
@@ -80,11 +62,6 @@ class Eva:
 			return env.assign(name, self.eval(value, env))
 		
 		# ------------------------------------
-		# Variable access:
-		if self.__is_var_name(exp):
-			return env.lookup(exp)
-
-		# ------------------------------------
 		# if-expression:
 		if exp[0] == 'if':
 			[_, condition, consequent, alternate] = exp
@@ -100,6 +77,31 @@ class Eva:
 			while self.eval(condition, env):
 				result = self.eval(body, env)
 			return result
+
+		# ------------------------------------
+		# Variable access: foo
+		if self.__is_var_name(exp):
+			return env.lookup(exp)
+
+		# ------------------------------------
+		# function call:
+		# (println "Hello World!")
+		# (+ x 5)
+		# (> foo bar)
+		if isinstance(exp, List):
+			fn = self.eval(exp[0])
+			
+			args = map(
+				lambda arg: self.eval(arg, env),
+				exp[1:]
+			)
+			
+			# 1. Native functions:
+			if isinstance(fn, Callable):
+				return fn(*args)
+
+			# 2. User-defined functions:
+			# TODO
 
 		raise UnimplementedExpression(f"Unimplemented expression: `{exp}`")
 
@@ -121,4 +123,4 @@ class Eva:
 
 	@staticmethod
 	def __is_var_name(exp):
-		return isinstance(exp, str) and re.match(r"^[a-zA-Z]+$", exp) != None
+		return isinstance(exp, str) and re.match(r"^[+\-*/<>=a-zA-Z_]+$", exp) != None

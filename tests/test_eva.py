@@ -1,7 +1,15 @@
-from typing import Callable, List
-from eva import Eva
-from eva_environment import Environment
-from eva_errors import *
+# from eva.eva import Eva
+# from eva.eva_environment import Environment
+# from eva.eva_errors import *
+
+#from eva import eva, eva_environment
+#Eva = eva.Eva
+#Environment = eva_environment.Environment
+
+
+from eva import interpreter
+from eva import environment
+
 
 
 class CaughtException(Exception):
@@ -11,35 +19,35 @@ class CaughtException(Exception):
 # Tests
 
 def test_selfEvaluating():
-	eva = Eva()
-	assert eva.eval(1) == 1
-	assert eva.eval('"Hello World"') == "Hello World"
+	ev = interpreter.Eva()
+	assert ev.eval(1) == 1
+	assert ev.eval('"Hello World"') == "Hello World"
 
 def test_basicMath():
-	eva = Eva()
-	assert eva.eval(['+', 1, 5]) == 6
-	assert eva.eval(['+', ['+', 3, 2], 5], 10)
-	assert eva.eval(['*', ['+', 3, 2], 5]) == 25
+	ev = interpreter.Eva()
+	assert ev.eval(['+', 1, 5]) == 6
+	assert ev.eval(['+', ['+', 3, 2], 5], 10)
+	assert ev.eval(['*', ['+', 3, 2], 5]) == 25
 
 def test_variables():
-	eva = Eva()
-	assert eva.eval(['var', 'x', 10]) == 10
-	assert eva.eval(['var', 'y', ['*', 2, 5]]) == 10
+	ev = interpreter.Eva()
+	assert ev.eval(['var', 'x', 10]) == 10
+	assert ev.eval(['var', 'y', ['*', 2, 5]]) == 10
 
 def test_env_variables():
-	env = Environment({
+	env = environment.Environment({
 		"true": True,
 		"VERSION": "0.1"
 	})
-	eva = Eva(env)
-	assert eva.eval('VERSION') == '0.1'
-	assert eva.eval(['var', 'isUser', 'true']) == True
-	env.parent = Environment({'X': 123})
-	assert eva.eval('X') == 123
+	ev = interpreter.Eva(env)
+	assert ev.eval('VERSION') == '0.1'
+	assert ev.eval(['var', 'isUser', 'true']) == True
+	env.parent = environment.Environment({'X': 123})
+	assert ev.eval('X') == 123
 
 def test_block():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin', 
 			['var', 'x', 10],
 			['var', 'y', 20],
@@ -47,8 +55,8 @@ def test_block():
 		]) == 230
 
 def test_nestedBlock():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin', 
 			['var', 'x', 10],
 			['begin',
@@ -59,8 +67,8 @@ def test_nestedBlock():
 		]) == 10
 
 def test_nestedBlock_2():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin', 
 			['var', 'value', 10],
 			['var', 'result', 
@@ -72,8 +80,8 @@ def test_nestedBlock_2():
 		]) == 20
 
 def test_set_keyword():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin', 
 			['var', 'data', 10],
 			['begin',
@@ -83,8 +91,8 @@ def test_set_keyword():
 		]) == 20
 
 def test_set_keyword_2():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin', 
 			['var', 'data', 10],
 			['begin',
@@ -96,8 +104,8 @@ def test_set_keyword_2():
 		]) == 20
 	
 def test_if():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin',
 			['var', 'x', 10],
 			['var', 'y', 0],
@@ -113,8 +121,8 @@ def test_if():
 	) == 20
 
 def test_while():
-	eva = Eva()
-	assert eva.eval(
+	ev = interpreter.Eva()
+	assert ev.eval(
 		['begin',
 			['var', 'counter', 0],
 			['var', 'result', 0],

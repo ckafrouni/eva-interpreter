@@ -9,8 +9,8 @@
 
 import re
 
-from eva_environment import Environment
-from eva_errors import UndefinedVariable, UnimplementedExpression
+from eva.environment import Environment
+from eva.errors import UndefinedVariable, UnimplementedExpression
 
 class Eva: 
 	"""

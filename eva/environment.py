@@ -1,5 +1,5 @@
 from typing import Any, Dict, TypeVar
-from eva_errors import UndefinedVariable
+from eva.errors import UndefinedVariable
 
 Environment = TypeVar('Environment')
 

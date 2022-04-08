@@ -1,19 +1,5 @@
-# from eva.eva import Eva
-# from eva.eva_environment import Environment
-# from eva.eva_errors import *
+from eva import interpreter, environment
 
-#from eva import eva, eva_environment
-#Eva = eva.Eva
-#Environment = eva_environment.Environment
-
-
-from eva import interpreter
-from eva import environment
-
-
-
-class CaughtException(Exception):
-	pass
 
 #-------------------------------------------------------------------# 
 # Tests

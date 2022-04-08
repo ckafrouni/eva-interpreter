@@ -35,9 +35,10 @@ class Eva:
 
 		# ------------------------------------
 		# Self evaluating expressions
-		if isNumber(exp):
+		if self.__is_number(exp):
 			return exp
-		if isString(exp):
+
+		if self.__is_string(exp):
 			return exp[1:-1]
 		
 		# ------------------------------------
@@ -80,7 +81,7 @@ class Eva:
 		
 		# ------------------------------------
 		# Variable access:
-		if isVariableName(exp):
+		if self.__is_var_name(exp):
 			return env.lookup(exp)
 
 		# ------------------------------------
@@ -110,11 +111,14 @@ class Eva:
 		return result
 
 
-def isNumber(exp):
-	return isinstance(exp, int) 
+	@staticmethod
+	def __is_number(exp):
+		return isinstance(exp, int) 
 
-def isString(exp):
-	return isinstance(exp, str) and exp[0] == '"' and exp[-1] == '"'
+	@staticmethod
+	def __is_string(exp):
+		return isinstance(exp, str) and exp[0] == '"' and exp[-1] == '"'
 
-def isVariableName(exp):
-	return isinstance(exp, str) and re.match(r"^[a-zA-Z]+$", exp) != None
+	@staticmethod
+	def __is_var_name(exp):
+		return isinstance(exp, str) and re.match(r"^[a-zA-Z]+$", exp) != None

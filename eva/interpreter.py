@@ -4,8 +4,8 @@
 # 	| ['begin', Exp...]
 # 	| ['var', NAME, Exp]
 # 	| ['set', NAME, Exp]
-# 	| ['if', NAME, Exp]
-# 	| ['while', NAME, Exp]
+# 	| ['if', Exp, Exp, Exp]
+# 	| ['while', Exp, Exp]
 # 	| NAME
 # 	| [NAME, Exp...] # Function call
 # 	;
@@ -84,28 +84,61 @@ class Eva:
 			return env.lookup(exp)
 
 		# ------------------------------------
+		# function declaration: (def square (x) (* x x))
+		if exp[0] == 'def':
+			[_, name, params, body] = exp
+
+			fn = {
+				'params': params,
+				'body': body,
+				'env': env # Closure !!
+			}
+
+			return env.define(name, fn)
+
+		# ------------------------------------
 		# function call:
 		# (println "Hello World!")
 		# (+ x 5)
 		# (> foo bar)
+		# (square 5)
 		if isinstance(exp, List):
-			fn = self.eval(exp[0])
+			fn = self.eval(exp[0], env)
 			
-			args = map(
+			args = list(map(
 				lambda arg: self.eval(arg, env),
 				exp[1:]
-			)
+			))
 			
 			# 1. Native functions:
 			if isinstance(fn, Callable):
 				return fn(*args)
 
 			# 2. User-defined functions:
-			# TODO
+			# fn['params'] = ['x', 'y']
+			# args = [5, 9]
+			activation_record = {}
+			for index, value in enumerate(fn['params']):
+				activation_record[value] = args[index]
+			
+			# the activation_environment's parent is the functions's env
+			# If we had set it to the current environment, we would have
+			# a dynamic scope
+			activation_env = Environment(
+				activation_record,
+				fn['env'] # static scope!
+			)
+			
+			return self.__eval_body(fn['body'], activation_env)
 
 		raise UnimplementedExpression(f"Unimplemented expression: `{exp}`")
+	
+	def __eval_body(self, body, env: Environment):
+		if body[0] == 'begin':
+			return self.__eval_block(body, env)
+		return self.eval(body, env)
 
-	def __eval_block(self, block, env):
+	def __eval_block(self, block, env: Environment):
 		[_, *expression] = block
 		result = None
 		for exp in expression:

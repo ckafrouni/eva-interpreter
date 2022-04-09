@@ -1,4 +1,7 @@
 
+from typing import List
+
+
 class Transformer:
 
 	@staticmethod
@@ -37,3 +40,27 @@ class Transformer:
 		[_, init, cond, modifier, body] = for_exp
 		while_exp = ['begin', init, ['while', cond , ['begin', body, modifier]]]
 		return while_exp
+
+	@staticmethod
+	def inc_to_set(inc_exp):
+		[_, x, *y] = inc_exp
+		if y:
+			return ['set', x, ['+', x, *y]]
+		return ['set', x, ['+', x, 1]]
+
+	@staticmethod
+	def dec_to_set(dec_exp):
+		[_, x, *y] = dec_exp
+		if y:
+			return ['set', x, ['-', x, *y]]
+		return ['set', x, ['-', x, 1]]
+
+	@staticmethod
+	def mul_to_set(mul_exp):
+		[_, var, mul] = mul_exp
+		return ['set', var, ['*', var, mul]]
+
+	@staticmethod
+	def pow_to_set(pow_exp):
+		[_, var, pow] = pow_exp
+		return ['set', var, ['**', var, pow]]

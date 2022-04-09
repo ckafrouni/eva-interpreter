@@ -123,6 +123,40 @@ class Eva:
 			return self.eval(while_exp, env)
 
 		# ------------------------------------
+		# Increment: 
+		# (++ foo) | (+= foo inc)
+		# SS
+		if exp[0] == '++':
+			print("In ")
+			return self.eval(self.__transformer.inc_to_set(exp), env)
+
+		if exp[0] == '+=':
+			return self.eval(self.__transformer.inc_to_set(exp), env)
+
+		# ------------------------------------
+		# Increment: 
+		# (-- foo) | (-- foo dec)
+		# SS
+		if exp[0] == '--':
+			return self.eval(self.__transformer.dec_to_set(exp), env)
+		if exp[0] == '-=':
+			return self.eval(self.__transformer.dec_to_set(exp), env)
+
+		# ------------------------------------
+		# Mul-assign: 
+		# (*= foo dec)
+		# SS
+		if exp[0] == '*=':
+			return self.eval(self.__transformer.mul_to_set(exp), env)
+
+		# ------------------------------------
+		# Pow-assign: 
+		# (**= foo dec)
+		# SS
+		if exp[0] == '**=':
+			return self.eval(self.__transformer.pow_to_set(exp), env)
+
+		# ------------------------------------
 		# function call:
 		# (println "Hello World!")
 		# (+ x 5)

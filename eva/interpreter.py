@@ -15,6 +15,7 @@ from typing import Callable, List
 
 from eva.environment import GLOBAL_ENVIRONMENT, Environment
 from eva.errors import UnimplementedExpression
+from eva.syntactic_sugar.transformer import Transformer
 
 class Eva: 
 	"""
@@ -26,6 +27,7 @@ class Eva:
 		Initialises an Eva instance with the global environment
 		"""
 		self._global = _global
+		self.__transformer = Transformer
 
 
 	def eval(self, exp, env: Environment=None):
@@ -88,10 +90,8 @@ class Eva:
 		#
 		# Syntactic suggar for: (var square (lambda (x) (* x x)))
 		if exp[0] == 'def':
-			[_, name, params, body] = exp
-			
 			# JIT-transpile to a variable declaration
-			var_exp = [ 'var', name, ['lambda', params, body]]
+			var_exp = self.__transformer.def_to_var_lambda(exp)
 
 			return self.eval(var_exp, env)
 

@@ -1,6 +1,6 @@
 from tests import eval_str as eval_str
 
-def test_0(eval_str):
+def test_while(eval_str):
 	assert eval_str("""
 		(begin
 			(var counter 0)
@@ -13,3 +13,14 @@ def test_0(eval_str):
 
 			result)
 	""") == 10
+
+def test_for(eval_str):
+	assert eval_str("""
+		(begin
+			(var count 0)
+			(for (var i 0) (< i 5) (set i (+ i 1))
+				(set count (+ count 1))
+			)
+			count
+			)
+	""") == 5

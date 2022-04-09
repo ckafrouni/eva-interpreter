@@ -30,3 +30,10 @@ class Transformer:
 			current = current[3]
 		
 		return if_exp
+
+	@staticmethod
+	def for_to_while(for_exp):
+		# for-expression: (for init cond modifier body)
+		[_, init, cond, modifier, body] = for_exp
+		while_exp = ['begin', init, ['while', cond , ['begin', body, modifier]]]
+		return while_exp

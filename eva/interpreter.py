@@ -115,6 +115,14 @@ class Eva:
 			return self.eval(if_exp, env)
 			
 		# ------------------------------------
+		# for-expression: (for init cond modifier body)
+		#
+		# Syntactic suggar for while-expressions
+		if exp[0] == 'for':
+			while_exp = self.__transformer.for_to_while(exp)
+			return self.eval(while_exp, env)
+
+		# ------------------------------------
 		# function call:
 		# (println "Hello World!")
 		# (+ x 5)

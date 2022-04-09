@@ -97,6 +97,17 @@ class Eva:
 			return env.define(name, fn)
 
 		# ------------------------------------
+		# Lambda functions: (lambda (x) (* x x))
+		if exp[0] == 'lambda':
+			[_, params, body] = exp
+
+			return {
+				'params': params,
+				'body': body,
+				'env': env # Closure !!
+			}
+			
+		# ------------------------------------
 		# function call:
 		# (println "Hello World!")
 		# (+ x 5)

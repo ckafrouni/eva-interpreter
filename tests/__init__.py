@@ -10,4 +10,6 @@ def new_eva():
 @pytest.fixture
 def eval_str():
 	"""Returns a functions that evaluates a string"""
-	return lambda exp: interpreter.Eva().eval(parse(exp))
+	return lambda exp: interpreter.Eva().eval(
+		parse(f"(begin {exp})")
+	)

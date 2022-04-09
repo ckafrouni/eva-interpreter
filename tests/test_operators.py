@@ -24,20 +24,16 @@ def test_2(eval_str):
 
 def test_3(eval_str):
 	assert eval_str("""
-	(begin
-		(var x 0)
-		(+= x 15)
-		(*= x 2)
-		(-= x 5)
-		x
-	)
+    (var x 0)
+    (+= x 15)
+    (*= x 2)
+    (-= x 5)
+    x
 	""") == 25
 
 def test_4(eval_str):
 	assert eval_str("""
-	(begin
-		(var x 2)
-		(**= x 3)
-		x
-	)
+    (var x 2)
+    (**= x 3)
+    x
 	""") == 8

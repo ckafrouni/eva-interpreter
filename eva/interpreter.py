@@ -60,8 +60,19 @@ class Eva:
 		# ------------------------------------
 		# Variable update: (set foo 10)
 		if exp[0] == 'set':
-			[_, name, value] = exp
-			return env.assign(name, self.eval(value, env))
+			[_, ref, value] = exp
+			
+			# Assign to a property
+			if ref[0] == 'prop':
+				[_, instance, prop_name] = ref
+				instance_env = self.eval(instance, env)
+				return instance_env.define(
+					prop_name,
+					self.eval(value, env)
+				)
+
+			# Simple assignment
+			return env.assign(ref, self.eval(value, env))
 		
 		# ------------------------------------
 		# if-expression:
@@ -84,27 +95,6 @@ class Eva:
 		# Variable access: foo
 		if self.__is_var_name(exp):
 			return env.lookup(exp)
-
-		# ------------------------------------
-		# function declaration: (def square (x) (* x x))
-		#
-		# Syntactic suggar for: (var square (lambda (x) (* x x)))
-		if exp[0] == 'def':
-			# JIT-transpile to a variable declaration
-			var_exp = self.__transformer.def_to_var_lambda(exp)
-
-			return self.eval(var_exp, env)
-
-		# ------------------------------------
-		# Lambda functions: (lambda (x) (* x x))
-		if exp[0] == 'lambda':
-			[_, params, body] = exp
-
-			return {
-				'params': params,
-				'body': body,
-				'env': env # Closure !!
-			}
 
 		# ------------------------------------
 		# Switch-expression: (switch (cond1 block1) (cond2 block2) ...)
@@ -157,6 +147,78 @@ class Eva:
 			return self.eval(self.__transformer.pow_to_set(exp), env)
 
 		# ------------------------------------
+		# function declaration: (def square (x) (* x x))
+		#
+		# Syntactic suggar for: (var square (lambda (x) (* x x)))
+		if exp[0] == 'def':
+			# JIT-transpile to a variable declaration
+			var_exp = self.__transformer.def_to_var_lambda(exp)
+
+			return self.eval(var_exp, env)
+
+		# ------------------------------------
+		# Lambda functions: (lambda (x) (* x x))
+		if exp[0] == 'lambda':
+			[_, params, body] = exp
+
+			return {
+				'params': params,
+				'body': body,
+				'env': env # Closure !!
+			}
+
+		# ------------------------------------
+		# Class declaration: (class <Name> <Parent> <Body>)
+		if exp[0] == 'class':
+			[_, name, parent, body] = exp
+			# a class is an environment -- storage of methods
+			# and properties
+
+			parent_env = self.eval(parent, env) or env
+			class_env = Environment({}, parent_env)
+			
+			# Body is evaluated in the class environment
+			self.__eval_body(body, class_env)
+			
+			# class is accessible by name
+			return env.define(name, class_env)
+
+		# # ------------------------------------
+		# # Super expresson: (super <ClassName>)
+		# if exp[0] == 'super':
+		# 	pass
+
+		# ------------------------------------
+		# Class instanciation: (new <Class> <Arguments> ...)
+		if exp[0] == 'new':
+			[_, class_name, *args] = exp
+			class_env = self.eval(class_name, env)
+
+			# create an instance of the class
+			instance = Environment({}, class_env)
+			
+			evaluated_args = list(map(
+				lambda arg: self.eval(arg, env),
+				args
+			))
+
+			self.__call_user_defined_function(
+				class_env.lookup('constructor'),
+				[instance, *evaluated_args]
+			)
+			
+			return instance
+			
+		# ------------------------------------
+		# Property access: (prop <instance> <name>)
+		if exp[0] == 'prop':
+			[_, instance, name] = exp
+			
+			instance_env = self.eval(instance, env)
+			
+			return instance_env.lookup(name)
+
+		# ------------------------------------
 		# function call:
 		# (println "Hello World!")
 		# (+ x 5)
@@ -175,21 +237,7 @@ class Eva:
 				return fn(*args)
 
 			# 2. User-defined functions:
-			# fn['params'] = ['x', 'y']
-			# args = [5, 9]
-			activation_record = {}
-			for index, value in enumerate(fn['params']):
-				activation_record[value] = args[index]
-			
-			# the activation_environment's parent is the functions's env
-			# If we had set it to the current environment, we would have
-			# a dynamic scope
-			activation_env = Environment(
-				activation_record,
-				fn['env'] # static scope!
-			)
-			
-			return self.__eval_body(fn['body'], activation_env)
+			return self.__call_user_defined_function(fn, args)
 
 		raise UnimplementedExpression(f"Unimplemented expression: `{exp}`")
 	
@@ -204,8 +252,25 @@ class Eva:
 		for exp in expression:
 			result = self.eval(exp, env)
 		return result
+	
+	def __call_user_defined_function(self, fn, args):
+		# fn['params'] = ['x', 'y']
+		# args = [5, 9]
+		activation_record = {}
+		for index, value in enumerate(fn['params']):
+			activation_record[value] = args[index]
+		
+		# the activation_environment's parent is the functions's env
+		# If we had set it to the current environment, we would have
+		# a dynamic scope
+		activation_env = Environment(
+			activation_record,
+			fn['env'] # static scope!
+		)
+		return self.__eval_body(fn['body'], activation_env)
 
-
+	#----------------------------------------------------------------
+	#----------------------------------------------------------------
 	@staticmethod
 	def __is_number(exp):
 		return isinstance(exp, int) 

@@ -105,6 +105,14 @@ class Eva:
 				'body': body,
 				'env': env # Closure !!
 			}
+
+		# ------------------------------------
+		# Switch-expression: (switch (cond1 block1) (cond2 block2) ...)
+		#
+		# Syntactic suggar for if-expressions
+		if exp[0] == 'switch':
+			if_exp = self.__transformer.switch_to_if(exp)
+			return self.eval(if_exp, env)
 			
 		# ------------------------------------
 		# function call:

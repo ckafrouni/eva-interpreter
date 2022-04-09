@@ -183,10 +183,11 @@ class Eva:
 			# class is accessible by name
 			return env.define(name, class_env)
 
-		# # ------------------------------------
-		# # Super expresson: (super <ClassName>)
-		# if exp[0] == 'super':
-		# 	pass
+		# ------------------------------------
+		# Super expresson: (super <ClassName>)
+		if exp[0] == 'super':
+			[_, class_name] = exp
+			return self.eval(class_name, env).parent
 
 		# ------------------------------------
 		# Class instanciation: (new <Class> <Arguments> ...)

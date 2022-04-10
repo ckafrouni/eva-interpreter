@@ -234,9 +234,9 @@ class Eva:
 			return env.define(name, module_env)
 
 		# ------------------------------------
-		# Module import: (import <Name>)
+		# Module import: (import <Name>) | (import <Name> (<props>))
 		if exp[0] == 'import':
-			[_, name] = exp
+			[_, name, *vars] = exp
 			# TODO: implement caching if importing same file
 			# TODO: handle user generated code in other directories
 			
@@ -248,7 +248,14 @@ class Eva:
 			
 			module_exp = ['module', name, body]
 			
-			return self.eval(module_exp, self._global)
+			if not vars:
+				return self.eval(module_exp, self._global)
+			
+			res = None
+			for v in vars[0]:
+				res = self.eval(['var', v, ['prop', module_exp, v]], self._global)
+			
+			return res
 
 		# ------------------------------------
 		# function call:

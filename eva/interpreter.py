@@ -220,6 +220,17 @@ class Eva:
 			return instance_env.lookup(name)
 
 		# ------------------------------------
+		# Module declaration: (module <Name> <body>)
+		if exp[0] == 'module':
+			[_, name, body] = exp
+			
+			module_env = Environment({}, env)
+			
+			self.__eval_body(body, module_env)
+			
+			return env.define(name, module_env)
+
+		# ------------------------------------
 		# function call:
 		# (println "Hello World!")
 		# (+ x 5)

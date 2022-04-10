@@ -48,7 +48,7 @@ GLOBAL_ENVIRONMENT = Environment({
 	'__VERSION': '0.1',
 	
 	'+': lambda x, y: x+y,
-	'-': lambda x, y: x-y,
+	'-': lambda x, y=None: x-y if y is not None else -x,
 	'*': lambda x, y: x*y,
 	'**': lambda x, y: x**y,
 	'/': lambda x, y: x/y,

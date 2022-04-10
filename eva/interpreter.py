@@ -10,12 +10,15 @@
 # 	| [NAME, Exp...] # Function call
 # 	;
 
+import os
+from posixpath import dirname
 import re
 from typing import Callable, List
 
 from eva.environment import GLOBAL_ENVIRONMENT, Environment
 from eva.errors import UnimplementedExpression
 from eva.syntactic_sugar.transformer import Transformer
+from parser import parse
 
 class Eva: 
 	"""
@@ -229,6 +232,23 @@ class Eva:
 			self.__eval_body(body, module_env)
 			
 			return env.define(name, module_env)
+
+		# ------------------------------------
+		# Module import: (import <Name>)
+		if exp[0] == 'import':
+			[_, name] = exp
+			# TODO: implement caching if importing same file
+			# TODO: handle user generated code in other directories
+			
+			module_src = ""
+			with open(f"{os.getcwd()}/eva/std/{name}.eva", 'r') as module_file:
+				module_src = module_file.read()
+
+			body = parse(f'(begin {module_src})')
+			
+			module_exp = ['module', name, body]
+			
+			return self.eval(module_exp, self._global)
 
 		# ------------------------------------
 		# function call:

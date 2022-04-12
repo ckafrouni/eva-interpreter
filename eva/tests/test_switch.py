@@ -1,4 +1,4 @@
-from tests import eval_str as eval_str
+from . import eval_str as eval_str
 
 def test_0(eval_str):
 	assert eval_str("""

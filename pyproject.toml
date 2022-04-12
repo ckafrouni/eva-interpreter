@@ -1,6 +1,4 @@
-[project]
-name = "eva"
-version = "0.0.1"
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["eva", "parser", "eva.syntactic_sugar"]

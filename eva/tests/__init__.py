@@ -1,5 +1,5 @@
 from eva import interpreter
-from parser import parse
+from eva.parser import parse
 import pytest
 
 @pytest.fixture
@@ -13,3 +13,5 @@ def eval_str():
 	return lambda exp: interpreter.Eva().eval(
 		parse(f"(begin {exp})")
 	)
+
+print("Hello")

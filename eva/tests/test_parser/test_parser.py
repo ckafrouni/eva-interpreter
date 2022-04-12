@@ -1,4 +1,4 @@
-from parser import parse
+from eva.parser import parse
 
 def test_0():
 	assert parse('(+ 1 5)') == ['+', 1, 5]

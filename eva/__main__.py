@@ -1,7 +1,7 @@
 import os
 import sys
 from eva.errors import UndefinedVariable
-from parser import parse
+from eva.parser import parse
 from eva.interpreter import Eva
 
 

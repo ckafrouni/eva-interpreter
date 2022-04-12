@@ -18,7 +18,7 @@ from typing import Callable, List
 from eva.environment import GLOBAL_ENVIRONMENT, Environment
 from eva.errors import UnimplementedExpression
 from eva.syntactic_sugar.transformer import Transformer
-from parser import parse
+from eva.parser import parse
 
 class Eva: 
 	"""
@@ -31,6 +31,7 @@ class Eva:
 		"""
 		self._global = _global
 		self.__transformer = Transformer
+		self.__stdlib = __file__.replace('interpreter.py', 'std')
 
 
 	def eval(self, exp, env: Environment=None):
@@ -120,7 +121,6 @@ class Eva:
 		# (++ foo) | (+= foo inc)
 		# SS
 		if exp[0] == '++':
-			print("In ")
 			return self.eval(self.__transformer.inc_to_set(exp), env)
 
 		if exp[0] == '+=':
@@ -241,8 +241,8 @@ class Eva:
 			# TODO: handle user generated code in other directories
 			
 			module_src = ""
-			if os.path.exists(f"{os.getcwd()}/eva/std/{name}.eva"):
-				with open(f"{os.getcwd()}/eva/std/{name}.eva", 'r') as module_file:
+			if os.path.exists(f"{self.__stdlib}/{name}.eva"):
+				with open(f"{self.__stdlib}/{name}.eva", 'r') as module_file:
 					module_src = module_file.read()
 			else:
 				with open(f"{os.getcwd()}/{name}.eva", "r") as module_file:

@@ -1,4 +1,4 @@
-from tests import eval_str as eval_str
+from . import eval_str as eval_str
 
 def test_math(eval_str):
 	assert eval_str("(+ 1 5)") == 6

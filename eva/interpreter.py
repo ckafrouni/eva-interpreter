@@ -241,8 +241,12 @@ class Eva:
 			# TODO: handle user generated code in other directories
 			
 			module_src = ""
-			with open(f"{os.getcwd()}/eva/std/{name}.eva", 'r') as module_file:
-				module_src = module_file.read()
+			if os.path.exists(f"{os.getcwd()}/eva/std/{name}.eva"):
+				with open(f"{os.getcwd()}/eva/std/{name}.eva", 'r') as module_file:
+					module_src = module_file.read()
+			else:
+				with open(f"{os.getcwd()}/{name}.eva", "r") as module_file:
+					module_src = module_file.read()
 
 			body = parse(f'(begin {module_src})')
 			

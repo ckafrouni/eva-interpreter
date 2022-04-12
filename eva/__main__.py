@@ -22,12 +22,10 @@ def run_interactive(interpret: Eva):
 
 
 def run_file(interpret: Eva, filename: str):
-	# print(os.getcwd())
 	try:
 		with open(filename,'r') as eva_file:
 			parsed = parse(f"(begin {eva_file.read()})")
 			interpret.eval(parsed)
-			# print(parsed)
 	except FileNotFoundError as e:
 		print(e)
 

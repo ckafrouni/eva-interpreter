@@ -1,24 +1,45 @@
 import os
 import sys
+
 from eva.errors import UndefinedVariable
 from eva.parser import parse
 from eva.interpreter import Eva
 
+from . import __version__ as V
+
+PROMPT_FG = "\033[35;5;5m"
+RESET = "\033[0m"
+
+INTERACTIVE_MSG = (
+	f"\n{PROMPT_FG}"
+	f"EVA interpreter v:{V}\n"
+	"----------------------\n"
+	f"{RESET}"
+)
+END_INTERACTIVE = (
+	f"\n\n{PROMPT_FG}"
+	"-------- END ---------"
+	f"{RESET}\n"
+)
+
+PROMPT = f"{PROMPT_FG}meva>> {RESET}"
+
 
 def run_interactive(interpret: Eva):
+	print(INTERACTIVE_MSG)
 	txt = ""
-	while True:
-		txt = input(">>> ")
-		if txt == "q":
-			break
-		parsed = parse(txt)
-		try:
-			if result := interpret.eval(parsed):
-				print(result)
-		except UndefinedVariable as e:
-			print(e)
-		except Exception as e:
-			print(e)
+	try:
+		while True:
+			try:
+				parsed = parse(input(PROMPT))
+				if result := interpret.eval(parsed):
+					print(result)
+			except UndefinedVariable as e:
+				print(e)
+			except Exception as e:
+				print(e)
+	except KeyboardInterrupt as e:
+		print(END_INTERACTIVE)
 
 
 def run_file(interpret: Eva, filename: str):

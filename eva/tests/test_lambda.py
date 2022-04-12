@@ -20,7 +20,7 @@ def test_1(eval_str):
 
 
 # Save lambda to variable
-def test_1(eval_str):
+def test_2(eval_str):
 	assert eval_str("""
 	(var add (lambda (x y) (+ x y)))
 	(add 10 20)

@@ -1,0 +1,6 @@
+[project]
+name = "eva"
+version = "0.0.1"
+
+[tool.setuptools]
+packages = ["eva", "parser", "eva.syntactic_sugar"]

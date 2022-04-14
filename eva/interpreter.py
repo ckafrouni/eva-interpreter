@@ -10,10 +10,11 @@
 # 	| [NAME, Exp...] # Function call
 # 	;
 
+from ctypes import Union
 import os
 from posixpath import dirname
 import re
-from typing import Callable, List
+from typing import Any, Callable, List
 
 from eva.environment import GLOBAL_ENVIRONMENT, Environment
 from eva.errors import UnimplementedExpression
@@ -276,7 +277,7 @@ class Eva:
 			))
 			
 			# 1. Native functions:
-			if isinstance(fn, Callable):
+			if callable(fn):
 				return fn(*args)
 
 			# 2. User-defined functions:

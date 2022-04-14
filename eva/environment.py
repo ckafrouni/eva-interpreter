@@ -1,11 +1,9 @@
 from typing import Any, Dict, TypeVar
 from eva.errors import UndefinedVariable
 
-Environment = TypeVar('Environment')
-
 class Environment:
 
-	def __init__(self, record: Dict[str, Any]=None, parent: Environment=None):
+	def __init__(self, record: Dict[str, Any]=None, parent: 'Environment'=None):
 		if not record:
 			record = {}
 		self.record = record
@@ -31,7 +29,7 @@ class Environment:
 		"""
 		return self._resolve(name).record.get(name)
 	
-	def _resolve(self, name: str) -> Environment:
+	def _resolve(self, name: str) -> 'Environment':
 		if name in self.record:
 			return self
 		if self.parent:
